@@ -58,24 +58,34 @@ class SEUWlanHelper(object):
 
     def __init__(self, auth_session=requests.sessions.Session()) -> None:
         self.sess = auth_session
-        self.conn_ip = None
-        self.conn_mac = None
+        self._conn_ip = None
+        self._conn_mac = None
+
+    @property
+    def conn_ip(self) -> str | None:
+        """Get the connected IP address."""
+        return self._conn_ip
+
+    @property
+    def conn_mac(self) -> str | None:
+        """Get the connected MAC address."""
+        return self._conn_mac
 
     def chk_status(self) -> bool:
         """Check the online status of the local device.
 
-        Returns True if connected, False otherwise. Updates conn_ip and conn_mac attributes.
+        Returns True if connected, False otherwise. Updates conn_ip and conn_mac properties.
         """
         resp = self.sess.get(self._URL_STATCHK)
         resptxt = resp.text
         respdict = json.loads(resptxt[resptxt.find("(")+1:resptxt.rfind(")")])
 
-        self.conn_ip = respdict["v46ip"]
+        self._conn_ip = respdict["v46ip"]
         if respdict["result"] == 1:
-            self.conn_mac = respdict["olmac"]
+            self._conn_mac = respdict["olmac"]
             return True
         else:
-            self.conn_mac = None
+            self._conn_mac = None
             return False
 
     def get_info_by_ip(self, query_ip: str) -> dict | None:
@@ -124,7 +134,6 @@ class SEUWlanHelper(object):
         resptxt = resp.text
         respdict = json.loads(resptxt[resptxt.find("(")+1:resptxt.rfind(")")])
         self.chk_status()
-        print(respdict)
         if respdict["result"] == "1":
             return 0
         elif respdict["msg"] == "bGRhcCBhdXRoIGVycm9y":
@@ -149,7 +158,6 @@ class SEUWlanHelper(object):
         resptxt = resp.text
         respdict = json.loads(resptxt[resptxt.find("(")+1:resptxt.rfind(")")])
         self.chk_status()
-        print(respdict)
         if respdict["result"] == "1":
             return 0
         else:
