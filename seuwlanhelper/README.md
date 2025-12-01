@@ -24,23 +24,23 @@ from seuwlanhelper import SEUWlanHelper
 helper = SEUWlanHelper()
 
 # Check local device status
-if helper.chkStatus():
+if helper.chk_status():
     print(f"Connected to IP: {helper.conn_ip}, MAC: {helper.conn_mac}")
 else:
     print("Not connected")
 
 # Check remote device status
 remote_ip = "10.201.666.777"
-info_dict = helper.getInfoByIp(remote_ip)
+info_dict = helper.get_info_by_ip(remote_ip)
 if info_dict is not None:
-    remote_mac = helper.fetchMacFromDict(info_dict)
-    remote_account = helper.fetchAccountFromDict(info_dict)
+    remote_mac = helper.fetch_mac_from_dict(info_dict)
+    remote_account = helper.fetch_account_from_dict(info_dict)
     print(f"Remote device: MAC {remote_mac}, Account {remote_account}")
 
 # Login/bind to IP
 account = "your_account"
 password = "your_password"
-result = helper.bindLogin(account, password, remote_ip)
+result = helper.bind_login(account, password, remote_ip)
 if result == 0:
     print("Login successful")
 elif result == -1:
@@ -48,7 +48,7 @@ elif result == -1:
 # See docstrings for other return codes
 
 # Kick/unbind device
-result = helper.kickIp(remote_ip)
+result = helper.kick_ip(remote_ip)
 if result == 0:
     print("Kick successful")
 else:
