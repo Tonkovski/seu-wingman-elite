@@ -13,6 +13,7 @@ The module communicates with the SEU auth portal endpoints to facilitate these o
 
 Example usage:
 
+```python
     import os
     import pickle
     from seuauthhelper import SEUAuthHelper
@@ -40,6 +41,7 @@ Example usage:
         status = helper.login(username, password, sms_code)
     
     redr_url = helper.auth_service("http://ehall.seu.edu.cn/gsapp/sys/jzxxtjapp/*default/index.do")
+```
 
 Note: This module is specific to the SEU CAS Single Sign-On system and requires valid credentials.
 
