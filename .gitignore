@@ -1,0 +1,12 @@
+# Python bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Pickle files
+*.pkl
+*.pickle
+
+# Temporary files
+*.tmp
+*.temp

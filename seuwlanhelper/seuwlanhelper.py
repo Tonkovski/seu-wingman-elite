@@ -1,12 +1,10 @@
-"""SEU WLAN Helper Module
+"""seuwlanhelper.py
 
-This module provides a Python interface for interacting with the Southeast University (SEU) campus wireless network authentication system.
+This library provides a Python interface for interacting with the Southeast University (SEU) campus wireless network authentication system.
 
 It offers functionality to:
-- Check online status of local and remote devices, including MAC address queries
-- Login and kick (unbind) local and remote devices
-
-The module communicates with the SEU WLAN portal endpoints to facilitate these operations.
+- Check online status of local and remote devices, including MAC address queries.
+- Login and kick (unbind) local and remote devices.
 
 Example usage:
 
@@ -41,7 +39,7 @@ Example usage:
     result = helper.kick_ip(helper.conn_ip)
     result = helper.kick_ip(remote_ip)
 
-Note: This module is specific to the SEU campus network and require valid credentials.
+Note: This library is specific to the SEU campus network and require valid credentials.
 
 Scratched by tonkov
 """
@@ -56,19 +54,24 @@ class SEUWlanHelper(object):
     _URL_LOGIN_BIND = "https://w.seu.edu.cn:802/eportal/?c=Portal&a=login&login_method=1&user_account=,0,%s&user_password=%s&wlan_user_ip=%s"
     _URL_LOGIN_UNBIND = "https://w.seu.edu.cn:802/eportal/?c=Portal&a=unbind_mac&wlan_user_ip=%s"
 
-    def __init__(self, auth_session=requests.sessions.Session()) -> None:
+    def __init__(self, auth_session:requests.Session=requests.Session()) -> None:
+        """Initialize the SEUWlanHelper instance.
+
+        Args:
+            auth_session (requests.Session, optional): A custom requests session to use for HTTP requests. Defaults to a new session.
+        """
         self.sess = auth_session
         self._conn_ip = None
         self._conn_mac = None
 
     @property
     def conn_ip(self) -> str | None:
-        """Get the connected IP address."""
+        """Get the connected IP address. Returns None if chk_status() has not been called."""
         return self._conn_ip
 
     @property
     def conn_mac(self) -> str | None:
-        """Get the connected MAC address."""
+        """Get the connected MAC address. Returns None if chk_status() has not been called."""
         return self._conn_mac
 
     def chk_status(self) -> bool:
@@ -162,6 +165,3 @@ class SEUWlanHelper(object):
             return 0
         else:
             return -1
-
-if __name__ == "__main__":
-    pass
