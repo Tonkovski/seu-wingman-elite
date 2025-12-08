@@ -1,6 +1,8 @@
 """seuauthhelper.py
 
-This library provides a Python interface for interacting with the Southeast University (SEU) authentication system.
+This tool lib provides a Python interface for interacting with the Southeast University (SEU) CAS Single Sign-On system.
+
+Related service portal: https://auth.seu.edu.cn/dist/#/dist/main/login
 
 It offers functionality to:
 - Login with username and password
@@ -9,41 +11,9 @@ It offers functionality to:
 - Verify login status
 - Authenticate services
 
-The module communicates with the SEU auth portal endpoints to facilitate these operations.
+The lib communicates with the SEU auth portal endpoints to facilitate these operations.
 
-Example usage:
-
-```python
-    import os
-    import pickle
-    from seuauthhelper import SEUAuthHelper
-
-    username = "230123456"
-    password = "L3tMe1n!"
-
-    helper = SEUAuthHelper()
-
-    if os.path.exists('cookies.pkl'):
-        with open('cookies.pkl', 'rb') as f:
-            cookies = pickle.load(f)
-        helper.update_cookies(cookies)
-        print("Cookies loaded")
-    else:
-        print("No saved cookies found")
-
-    status = helper.login(username, password)
-    if status == 0:
-        print("Login successful")
-    elif status == 2:
-        # SMS 2FA required
-        helper.send_sms_2fa(username)
-        sms_code = input("Enter SMS code: ")
-        status = helper.login(username, password, sms_code)
-    
-    redr_url = helper.auth_service("http://ehall.seu.edu.cn/gsapp/sys/jzxxtjapp/*default/index.do")
-```
-
-Note: This module is specific to the SEU CAS Single Sign-On system and requires valid credentials.
+Note: This lib is specific to the SEU CAS Single Sign-On system and requires valid credentials.
 
 Scratched by tonkov
 """
@@ -58,6 +28,22 @@ import base64
 from Crypto.PublicKey import RSA
 from Crypto.Cipher import PKCS1_v1_5
 import pickle
+
+from requests.adapters import HTTPAdapter
+import urllib3
+import ssl
+
+class _CustomHttpAdapter (requests.adapters.HTTPAdapter):
+    """A custom HTTP adapter to enable legacy SSL connection."""
+
+    def __init__(self, ssl_context=None, **kwargs):
+        self.ssl_context = ssl_context
+        super().__init__(**kwargs)
+
+    def init_poolmanager(self, connections, maxsize, block=False):
+        self.poolmanager = urllib3.poolmanager.PoolManager(
+            num_pools=connections, maxsize=maxsize,
+            block=block, ssl_context=self.ssl_context)
 
 
 class SEUAuthHelper(object):
@@ -81,6 +67,13 @@ class SEUAuthHelper(object):
             allow_header_override (bool, optional): Whether to set default headers (User-Agent and Content-Type) on the session. Defaults to True. Disabling this may cause authentication issues.
         """
         self._sess = sess_override
+
+        ctx = ssl._create_unverified_context()
+        ctx.options |= 0x40000  # Allow unsafe legacy renegotiation
+        adapter = _CustomHttpAdapter(ssl_context=ctx)
+        self._sess.mount('https://', adapter)
+        self._sess.verify = False
+
         if allow_header_override:
             self._sess.headers.update({
                 "User-Agent": self._USER_AGENT,
@@ -204,7 +197,7 @@ class SEUAuthHelper(object):
             "loginType": "account",
             "wxBinded": False,
             "mobilePhoneNum": "",
-            "fingerprint": self._fake_fingerprint
+            "fingerPrint": self._fake_fingerprint
         }
 
         if sms2fa != "":
@@ -254,20 +247,23 @@ class SEUAuthHelper(object):
         else:
             raise ValueError("Unexpected response from sendStage2Code API: %s" % resptxt)
     
-    def auth_service(self, service_url: str) -> str | None:
-        """Authenticate access to a service and get the redirect URL. Reuqires valid login session.
+    def auth_service(self, service_url: str) -> int:
+        """Authenticate a service. Requires valid login session.
 
         Args:
             service_url (str): The URL of the service to authenticate.
 
         Returns:
-            str | None: The redirect URL for the authenticated service, or None if authentication fails.
+            int: 0 if authentication succeeds, -1 if it fails (i.e., no redirectUrl in response).
         """
         payload = {"service": service_url}
         resp = self._sess.post(self._URL_VERIFYTGT, data=json.dumps(payload))
 
         resptxt = resp.text
         respdict = json.loads(resptxt)
+        self._sess.get(respdict["redirectUrl"])
         if "redirectUrl" not in respdict.keys():
-            return None
-        return respdict["redirectUrl"]
+            return -1
+        else:
+            self._sess.get(respdict["redirectUrl"])
+            return 0

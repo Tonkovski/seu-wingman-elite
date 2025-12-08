@@ -1,47 +1,12 @@
 """seuwlanhelper.py
 
-This library provides a Python interface for interacting with the Southeast University (SEU) campus wireless network authentication system.
+This tool lib provides a Python interface for interacting with the Southeast University (SEU) campus wireless network authentication system.
 
 It offers functionality to:
 - Check online status of local and remote devices, including MAC address queries.
 - Login and kick (unbind) local and remote devices.
 
-Example usage:
-
-```python
-from seuwlanhelper import SEUWlanHelper
-
-your_account = "230123456"
-your_password = "L3tMe1n!"
-remote_ip = "10.201.666.777"
-
-# Check local device status
-helper = SEUWlanHelper()
-if helper.chk_status():
-    print(f"Connected to IP: {helper.conn_ip}, MAC: {helper.conn_mac}")
-else:
-    print("Not connected")
-
-# Check remote device status
-info_dict = helper.get_info_by_ip(remote_ip)
-if info_dict is not None:
-remote_mac = helper.fetch_mac_from_dict(info_dict)
-remote_account = helper.fetch_account_from_dict(info_dict)
-
-
-# See function docs for return values
-# Local device login/bind
-result = helper.bind_login(your_account, your_password, helper.conn_ip)
-
-# Remote device login/bind
-result = helper.bind_login(your_account, your_password, remote_ip)
-
-# Local/remote device kick/unbind
-result = helper.kick_ip(helper.conn_ip)
-result = helper.kick_ip(remote_ip)
-```
-
-Note: This library is specific to the SEU campus network and require valid credentials.
+Note: This lib is specific to the SEU campus network and require valid credentials.
 
 Scratched by tonkov
 """
