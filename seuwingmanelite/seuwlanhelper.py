@@ -89,7 +89,7 @@ class SEUWlanHelper(object):
         else:
             return datadict["user_account"]
 
-    def bind_login(self, account: str, passwd: str, bind_ip)-> int:
+    def bind_login(self, account: str, passwd: str, bind_ip: str)-> int:
         """Login and bind device to IP with credentials.
 
         Args:
