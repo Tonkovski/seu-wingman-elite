@@ -261,8 +261,10 @@ class SEUAuthHelper(object):
 
         resptxt = resp.text
         respdict = json.loads(resptxt)
-        self._sess.get(respdict["redirectUrl"])
+
         if "redirectUrl" not in respdict.keys():
+            return -1
+        elif respdict["redirectUrl"] is None:
             return -1
         else:
             self._sess.get(respdict["redirectUrl"])

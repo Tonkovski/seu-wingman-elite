@@ -16,7 +16,7 @@ import json
 
 class SEUWlanHelper(object):
     _URL_STATCHK = "https://w.seu.edu.cn/drcom/chkstatus?callback="
-    _URL_FIND_MAC_ALL = "https://w.seu.edu.cn:802/eportal/?c=Portal&a=find_mac&user_account=%s" # Broken, won't display all MACs
+    _URL_FIND_MAC_ALL = "https://w.seu.edu.cn:802/eportal/?c=Portal&a=find_mac&user_account=%s" # Broken, won't display all MACs, try seuselfservicehelper instead
     _URL_FIND_MAC_BY_IP = "https://w.seu.edu.cn:802/eportal/?c=Portal&a=find_mac&wlan_user_ip=%s"
     _URL_LOGIN_BIND = "https://w.seu.edu.cn:802/eportal/?c=Portal&a=login&login_method=1&user_account=,0,%s&user_password=%s&wlan_user_ip=%s"
     _URL_LOGIN_UNBIND = "https://w.seu.edu.cn:802/eportal/?c=Portal&a=unbind_mac&wlan_user_ip=%s"

@@ -59,14 +59,14 @@ class SEUSelfserviceHelper(SEUAuthHelper):
         """
         return super().auth_service(self._URL_PORTAL)
 
-    def get_online_list(self) -> dict | None:
+    def get_online_list(self) -> list | None:
         """Get the list of online devices.
 
         Returns:
-            dict | None: Dictionary containing the online list or None if request failed.
+            list | None: list containing the online list or None if request failed.
             
         Note:
-            Each dictionary contains device info with keys: 'brasid', 'downFlow', 'hostName', 'ip', 
+            Each list contains device info dicts with keys: 'brasid', 'downFlow', 'hostName', 'ip', 
             'loginTime', 'mac', 'sessionId', 'terminalType', 'upFlow', 'useTime', 'userId'.
         """
         resp = self._sess.get(self._URL_GETONLINELIST, allow_redirects=False)
@@ -76,14 +76,14 @@ class SEUSelfserviceHelper(SEUAuthHelper):
         respdict = json.loads(resptxt)
         return respdict
 
-    def get_bind_list(self) -> dict | None:
+    def get_bind_list(self) -> list | None:
         """Get the list of bound MAC addresses.
 
         Returns:
-            dict | None: Dictionary containing the bound MAC list or None if request failed.
+            list | None: List containing the bound MAC list or None if request failed.
             
         Note: 
-            The returned dictionary typically contains a list of binded devices, 
+            The returned list typically contains a list of binded devices, 
             where each device is represented as ['isonline', 'MAC', 'type', 'onlinetime', 'IP'].
         """
         resp = self._sess.get(self._URL_GETMACLIST, allow_redirects=False)
