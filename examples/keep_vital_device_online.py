@@ -88,6 +88,10 @@ def method_2():
     # Kick unimportant devices if needed
     selfservice_helper.unbind_macs(MAC_REGULAR_DEVICE_LIST[0])
 
+    # Optional, store cookies for better performance next time
+    with open('cookies.pkl', 'wb') as f:
+        pickle.dump(selfservice_helper.sess.cookies, f)
+
 # Reminder again, this script is for demonstration purpose only, make your own main.py instead of using this one.
 METHOD_CHOICES = 1
 if __name__ == "__main__":
